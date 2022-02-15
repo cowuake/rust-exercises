@@ -5,12 +5,15 @@ mod basic {
     const ARRAY_STRING: [&str; 4] = ["Hello ", "World ", "from", "Rust!"];
 
     // SEARCHING ALGORITHMS
-    fn linear_search<T:std::cmp::PartialEq>(array: &[T], cmp_elem: T)
+    // ====================
+    // --- linear search O(n)
+    // --- binary search O(log2(n))
+    fn linear_search<T: Eq>(arr: &[T], cmp_elem: T)
 					    -> usize {
 	let mut idx: usize = 999;
 
-	for i in 0..array.len() {
-	    if array[i] == cmp_elem {
+	for i in 0..arr.len() {
+	    if arr[i] == cmp_elem {
 		idx = i;
 		break;
 	    }
@@ -18,10 +21,10 @@ mod basic {
 
 	idx
     }
-    fn binary_search<T:std::cmp::PartialOrd>(array: &[T], cmp_elem: T, idx_0: usize)
+    fn binary_search<T: Ord>(arr: &[T], cmp_elem: T, idx_0: usize)
 					     -> usize { // Recursive implementation
 	// Split the array using the median element as pivot
-	let (left_slice, right_slice) = array.split_at(array.len()/2);
+	let (left_slice, right_slice) = arr.split_at(arr.len()/2);
 
 	// Index of the pivotal element
 	let guess = left_slice.len()-1;
@@ -40,16 +43,19 @@ mod basic {
     }
 
     // SORTING ALGORITHMS
-    fn bubble_sort<T:std::cmp::PartialOrd>(array: &mut [T]) {
-	//let mut new_array = array.clone();
-	let n = array.len()-1;
+    // ==================
+    // --- bubble sort O(n^2)
+    // --- quick sort O(n^2) -> Faster than bubble sort on average
+    // --- merge sort O(n*log(n))
+    fn bubble_sort<T: Ord>(arr: &mut [T]) {
+	let n = arr.len()-1;
 	let mut n_swaps: usize;
 
 	loop {
-	    n_swaps = 0;
+	    n_swaps = 0; // Must become 0 when a new loop cycle begins
 	    for i in 0..n {
-		if array[i+1] < array[i] {
-		    array.swap(i, i+1);
+		if arr[i+1] < arr[i] {
+		    arr.swap(i, i+1);
 		    n_swaps += 1;
 		}
 	    }
@@ -57,7 +63,43 @@ mod basic {
 	    if n_swaps == 0 { break; }
 	}
     }
+    fn quick_sort<T: Ord>(arr: &mut [T]) { // WORK IN PROGRESS!!!
+	let pivot = &arr.len()/2;
+	//let pivot_value = arr.get(pivot).unwrap().clone();
+	let pivot_value = &arr[pivot];
+	let mut n_left: usize = 0;
+	let mut n_right: usize = 0;
+	for a in arr.as_ref() {
+	    if a < pivot_value {
+		n_left += 1;
+	    }
+	    if a > pivot_value {
+		n_right += 1;
+	    }
+	}
+    }
+    fn merge_sort<T: Ord>(arr: &mut [T]) {
+	// TODO
+    }
 
+    // MISCELLANEA
+    fn sieve_of_erathostenes(limit: i32) -> Vec<i32>{
+	let mut sieve: Vec<i32> = (2..limit+1).collect();
+	let mut pivot: usize = 0; // Index of pivot element
+	let mut root: i32; // Value of pivot element
+	let mut square: i32; // Squared value of pivot element
+
+	loop {
+	    root = sieve[pivot];
+	    // NOTE: A better exit condition should be found
+	    if root >= sieve[sieve.len()-1] { break; }
+
+	    square = root.pow(2);
+	    sieve.retain(|n| n<&square || n%root != 0);
+	    pivot += 1;
+	}
+	sieve
+    }
 
     #[test]
     fn test_linear_search() {
@@ -74,5 +116,17 @@ mod basic {
 	let mut array = ARRAY_I32_UNSORTED.clone();
 	bubble_sort(&mut array);
 	assert_eq!(array, ARRAY_I32_SORTED);
+    }
+
+    //#[test]
+    //fn test_quick_sort() {
+    //	let mut array = ARRAY_I32_UNSORTED.clone();
+    //	quick_sort(&mut array);
+    //	assert_eq!(array, ARRAY_I32_SORTED);
+    //}
+
+    #[test]
+    fn test_sieve_of_erathostenes() {
+	assert_eq!(sieve_of_erathostenes(42), vec![2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41])
     }
 }
