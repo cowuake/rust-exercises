@@ -2,6 +2,10 @@
 mod basic {
     const ARRAY_I32_SORTED: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     const ARRAY_I32_UNSORTED: [i32; 10] = [3, 10, 1, 5, 9, 4, 7, 8, 6, 2];
+
+    const ARRAY_I32_SORTED2: [i32; 9] = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    const ARRAY_I32_UNSORTED2: [i32; 9] = [3, 1, 5, 9, 4, 7, 8, 6, 2];
+
     const ARRAY_STRING: [&str; 4] = ["Hello ", "World ", "from", "Rust!"];
 
     // SEARCHING ALGORITHMS
@@ -78,8 +82,33 @@ mod basic {
 	    }
 	}
     }
-    fn merge_sort<T: Ord>(arr: &mut [T]) {
-	// TODO
+    fn merge_sort<T: Ord>(arr: &mut [T]) { // WORK IN PROGRESS!!!
+	let mut step: usize;
+
+	for n in 1..arr.len()/2 { // N/2 passes at most
+	    step = 2*n; // Slices count twice the step number elements
+	    for m in (0..arr.len()).step_by(step) {
+		// The last slice can have a lower number of elements
+		let limit = std::cmp::min(m+step, arr.len());
+		//println!("Working on {:?}", m..limit);
+		for p in m..limit {
+		    let tmp = &arr[p..limit];
+		    println!("Tmp slice: {:?}", p..limit);
+		    let mut min_idx = tmp
+			.iter()
+			.enumerate()
+			.min_by(|(_, a), (_, b)| a.cmp(b))
+			.map(|(idx, _)| idx)
+			.unwrap();
+		    // Trnslate from local (slice) to global indexing
+		    min_idx += p;
+		    println!("Min Idx: {}", min_idx);
+		    if p != min_idx {
+		    	arr.swap(p, min_idx);
+		    }
+		}
+	    }
+	}
     }
 
     // MISCELLANEA
@@ -113,9 +142,9 @@ mod basic {
 
     #[test]
     fn test_bubble_sort() {
-	let mut array = ARRAY_I32_UNSORTED.clone();
-	bubble_sort(&mut array);
-	assert_eq!(array, ARRAY_I32_SORTED);
+	let mut arr = ARRAY_I32_UNSORTED.clone();
+	bubble_sort(&mut arr);
+	assert_eq!(arr, ARRAY_I32_SORTED);
     }
 
     //#[test]
@@ -124,6 +153,13 @@ mod basic {
     //	quick_sort(&mut array);
     //	assert_eq!(array, ARRAY_I32_SORTED);
     //}
+
+    #[test]
+    fn test_merge_sort() {
+	let mut arr = ARRAY_I32_UNSORTED.clone();
+	merge_sort(&mut arr);
+	assert_eq!(arr, ARRAY_I32_SORTED);
+    }
 
     #[test]
     fn test_sieve_of_erathostenes() {
