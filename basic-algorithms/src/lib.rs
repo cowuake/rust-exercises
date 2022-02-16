@@ -82,27 +82,43 @@ mod basic {
 	    }
 	}
     }
-    fn merge_sort<T: Ord>(arr: &mut [T]) { // WORK IN PROGRESS!!!
+    fn merge_sort<T: Ord>(arr: &mut [T]) {
 	let mut step: usize;
 
-	for n in 1..arr.len()/2 { // N/2 passes at most
-	    step = 2*n; // Slices count twice the step number elements
+	// EX.: [3 10 1 5 9 4 7 8 6 2]
+	for n in 1..(arr.len()+1)/2 {
+	    // EX.: ....... m=0 .. m=2 . m=4 . m=6 . m=8 .....
+	    // .... n=1 => [3 10] [1 5] [9 4] [7 8] [6 2] ....
+	    // ............... m=0 ..... m=4 ... m=8 .........
+	    // .... n=2 => [3 10 1 5] [4 9 7 8] [6 2] ........
+	    // .................... m=0 ....... m=8 ..........
+	    // .... n=3 => [1 3 4 5 7 8 9 10 ] [2 6] .........
+	    // ...................... m=0 ....................
+	    // .... n=4 => [1 2 3 4 5 6 7 8 9 10] ............
+
+	    // This is the length of all slices exect last one
+	    step = 2_usize.pow(n as u32);
+
 	    for m in (0..arr.len()).step_by(step) {
-		// The last slice can have a lower number of elements
+		// Remember the last slice can have a lower number of elements
 		let limit = std::cmp::min(m+step, arr.len());
-		//println!("Working on {:?}", m..limit);
+
 		for p in m..limit {
+		    // "Extract" the slice to work on
 		    let tmp = &arr[p..limit];
-		    println!("Tmp slice: {:?}", p..limit);
+
+		    // Compute index of smaller element in slice
 		    let mut min_idx = tmp
 			.iter()
 			.enumerate()
 			.min_by(|(_, a), (_, b)| a.cmp(b))
 			.map(|(idx, _)| idx)
 			.unwrap();
-		    // Trnslate from local (slice) to global indexing
+
+		    // Translate from local (slice) to global indexing
 		    min_idx += p;
-		    println!("Min Idx: {}", min_idx);
+
+		    // Swap elements if first one is not smaller one
 		    if p != min_idx {
 		    	arr.swap(p, min_idx);
 		    }
@@ -155,10 +171,17 @@ mod basic {
     //}
 
     #[test]
-    fn test_merge_sort() {
+    fn test_merge_sort() { // Input with even number of element
 	let mut arr = ARRAY_I32_UNSORTED.clone();
 	merge_sort(&mut arr);
 	assert_eq!(arr, ARRAY_I32_SORTED);
+    }
+
+    #[test]
+    fn test_merge_sort2() { // Input with odd number of element
+	let mut arr = ARRAY_I32_UNSORTED2.clone();
+	merge_sort(&mut arr);
+	assert_eq!(arr, ARRAY_I32_SORTED2);
     }
 
     #[test]
