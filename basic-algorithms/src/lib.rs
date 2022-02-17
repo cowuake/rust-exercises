@@ -8,6 +8,17 @@ mod basic {
 
     const ARRAY_STRING: [&str; 4] = ["Hello ", "World ", "from", "Rust!"];
 
+    const GRAPH: [[usize; 9]; 9] = [
+	[0, 4, 0, 0, 0, 0, 0, 8, 0],
+	[4, 0, 8, 0, 0, 0, 0, 11, 0],
+	[0, 8, 0, 7, 0, 4, 0, 0, 2],
+	[0, 0, 7, 0, 9, 14, 0, 0, 0],
+	[0, 0, 0, 9, 0, 10, 0, 0, 0],
+	[0, 0, 4, 14, 10, 0, 2, 0, 0],
+	[0, 0, 0, 0, 0, 2, 0, 1, 6],
+	[8, 11, 0, 0, 0, 0, 1, 0, 7],
+	[0, 0, 2, 0, 0, 0, 6, 7, 0]];
+
     // SEARCHING ALGORITHMS
     // ====================
     // --- linear search O(n)
@@ -68,17 +79,53 @@ mod basic {
 	}
     }
     fn quick_sort<T: Ord>(arr: &mut [T]) { // WORK IN PROGRESS!!!
-	let pivot = &arr.len()/2;
-	//let pivot_value = arr.get(pivot).unwrap().clone();
-	let pivot_value = &arr[pivot];
-	let mut n_left: usize = 0;
-	let mut n_right: usize = 0;
-	for a in arr.as_ref() {
-	    if a < pivot_value {
-		n_left += 1;
-	    }
-	    if a > pivot_value {
-		n_right += 1;
+	if arr.len() > 1 {
+	    let length = arr.len();
+	    let mut pivot = length/2;
+	    let fake = length; // Cannot compare as index in left/right partitions
+	    let mut left_test = false;
+	    let mut right_test = false;
+
+	    loop {
+		println!("pivot: {}", pivot);
+		{ // Search for lower elements on the left of pivot and eventually swap
+		    let left = &arr[0..pivot];
+		    let left_index = left.iter().position(|x| x > &arr[pivot]).unwrap_or(fake);
+
+		    println!("left_index: {}", left_index);
+
+		    if left_index != fake { // Found lower value
+			arr.swap(left_index, pivot);
+			pivot = left_index;
+			println!("pivot becomes: {}", pivot);
+		    } else {
+			// The left partition is already OK
+			left_test = true;
+		    }
+		}
+		{ // Search for higher elements on the right of pivot and eventually swap
+		    let right = &arr[pivot+1..length];
+		    let right_index = right.iter().position(|x| x < &arr[pivot]).unwrap_or(fake);
+
+		    println!("right_index: {}", right_index+pivot+1);
+
+		    if right_index != fake { // Found higher value
+			arr.swap(right_index+pivot+1, pivot); // Pay attention, right partition!
+			pivot = right_index+pivot+1; // As above...
+			println!("pivot becomes: {}", pivot);
+		    } else {
+			// The right partition is already OK
+			right_test = true;
+		    }
+		}
+		if left_test && right_test { // Apply recursively to partitions
+		    quick_sort(&mut arr[0..pivot]);
+		    quick_sort(&mut arr[pivot+1..length]);
+		    break;
+		} else {
+		    left_test = false;
+		    right_test = false;
+		}
 	    }
 	}
     }
@@ -127,6 +174,10 @@ mod basic {
 	}
     }
 
+    // GRAPHS
+    fn dijkstra(arr: &[usize]) {
+    }
+
     // MISCELLANEA
     fn sieve_of_erathostenes(limit: i32) -> Vec<i32>{
 	let mut sieve: Vec<i32> = (2..limit+1).collect();
@@ -163,12 +214,19 @@ mod basic {
 	assert_eq!(arr, ARRAY_I32_SORTED);
     }
 
-    //#[test]
-    //fn test_quick_sort() {
-    //	let mut array = ARRAY_I32_UNSORTED.clone();
-    //	quick_sort(&mut array);
-    //	assert_eq!(array, ARRAY_I32_SORTED);
-    //}
+    #[test]
+    fn test_quick_sort() {
+    	let mut arr = ARRAY_I32_UNSORTED.clone();
+    	quick_sort(&mut arr);
+    	assert_eq!(arr, ARRAY_I32_SORTED);
+    }
+
+    #[test]
+    fn test_quick_sort2() {
+    	let mut arr = ARRAY_I32_UNSORTED2.clone();
+    	quick_sort(&mut arr);
+    	assert_eq!(arr, ARRAY_I32_SORTED2);
+    }
 
     #[test]
     fn test_merge_sort() { // Input with even number of element
@@ -182,6 +240,10 @@ mod basic {
 	let mut arr = ARRAY_I32_UNSORTED2.clone();
 	merge_sort(&mut arr);
 	assert_eq!(arr, ARRAY_I32_SORTED2);
+    }
+
+    #[test]
+    fn test_dijkstra() {
     }
 
     #[test]
