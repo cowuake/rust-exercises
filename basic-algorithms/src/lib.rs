@@ -1,5 +1,12 @@
+// IMPLEMENTATIONS OF DATA STRUCTURES
+// ==================================
+// --- linked list (llist.rs)
+mod llist;
+
 #[cfg(test)]
 mod basic {
+    // SOME CONSTANTS FOR TESTING
+    // ==========================
     const ARRAY_I32_SORTED: [i32; 10] = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
     const ARRAY_I32_UNSORTED: [i32; 10] = [3, 10, 1, 5, 9, 4, 7, 8, 6, 2];
 
