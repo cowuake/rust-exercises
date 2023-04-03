@@ -65,7 +65,7 @@ Run `cargo run` in the former case (try the toy program) and `cargo test` in the
 - [x] `factorial`
 > computes the factorial of a given number; it accepts the input as a command line argument, but if run without arguments will prompt the user for input --- it can deal with very large inputs, far larger that the ones I could manage on the same machine with C++ or Julia...
 
-- [ ] `tree`
+- [x] `tree`
 > an implementation of the classic `tree` command with a reduced set of options
 
 - [ ] ... The best is yet to come!
