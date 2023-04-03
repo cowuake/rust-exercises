@@ -63,7 +63,7 @@ Run `cargo run` in the former case (try the toy program) and `cargo test` in the
 > a simple GUI application relying on GTK bindings: to impress your housemates when you need to split bills!
 
 - [x] `factorial`
-> computes the factorial of a given number; it accepts the input as a command line argument, but if run without arguments will prompt the user for input --- it can deal with very large inputs, far larger that the ones I could manage on the same machine with C++ or Julia...
+> computes the factorial of a given number; it accepts the input as a command line argument, but if run without arguments will prompt the user for input --- it can deal with very large inputs, far larger than the ones I could manage on the same machine with C++ or Julia...
 
 - [x] `tree`
 > an implementation of the classic `tree` command with a reduced set of options
