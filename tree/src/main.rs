@@ -33,7 +33,7 @@ fn walk(
     max_depth: usize,       // Maximum depth level to be used
     depth: usize,           // Present depth level
     filler_previous: &str,  // Filler string (prefix of the file/directory name)
-    all: bool,              // True if hidden files have to be included
+    include_hidden: bool,   // True if hidden files have to be included
     directories_only: bool, // True if only directory have to be listed
 ) -> Result<()> {
     if dir.is_dir() {
@@ -43,76 +43,79 @@ fn walk(
 
         let root = fs::read_dir(dir);
 
-        let mut entries: Vec<fs::DirEntry> = vec![];
+        match root {
+            Ok(dir_iterator) => {
+                let mut entries: Vec<fs::DirEntry> = vec![];
 
-        for e in root.unwrap() {
-            if e.as_ref().unwrap().path().is_dir()
-                || (e.as_ref().unwrap().path().is_file() && !directories_only)
-            {
-                if all {
-                    // Show all files and directories, included hidden ones
-                    entries.push(e.unwrap());
-                } else {
-                    // Ignore hidden files and directories
-                    if !e
-                        .as_ref()
-                        .unwrap()
-                        .file_name()
-                        .to_str()
-                        .unwrap()
-                        .starts_with(".")
+                for e in dir_iterator {
+                    if e.as_ref().unwrap().path().is_dir()
+                        || (e.as_ref().unwrap().path().is_file() && !directories_only)
                     {
-                        entries.push(e.unwrap());
+                        if include_hidden {
+                            // Show all files and directories, included hidden ones
+                            entries.push(e.unwrap());
+                        } else {
+                            // Ignore hidden files and directories
+                            if !e
+                                .as_ref()
+                                .unwrap()
+                                .file_name()
+                                .to_str()
+                                .unwrap()
+                                .starts_with(".")
+                            {
+                                entries.push(e.unwrap());
+                            }
+                        }
+                    }
+                }
+
+                entries.sort_by(|a, b| a.path().file_name().cmp(&b.path().file_name()));
+
+                for (idx, entry) in entries.iter().enumerate() {
+                    let path = entry.path();
+                    let is_last: bool = entries.len() - idx - 1 == 0;
+
+                    let mut filler_next = String::new();
+                    let mut filler_present = String::new();
+
+                    match is_last {
+                        true => filler_present.push_str(SYMB_TFT),
+                        false => filler_present.push_str(SYMB_TTT),
+                    }
+
+                    filler_next.push_str(&filler_previous);
+                    filler_next.push_str(&filler_present);
+
+                    if path.is_dir() || (path.is_file() && !directories_only) {
+                        println!(
+                            "{}{}{}",
+                            &filler_previous,
+                            &filler_present,
+                            &path.file_name().unwrap().to_str().unwrap()
+                        );
+                    }
+
+                    if path.is_dir() {
+                        walk(
+                            &path,
+                            max_depth,
+                            depth + 1,
+                            &filler_next
+                                .replace("─", " ")
+                                .replace("├", "│")
+                                .replace("└", " "),
+                            include_hidden,
+                            directories_only,
+                        )?;
                     }
                 }
             }
+            _ => (),
         }
-
-        entries.sort_by(|a, b| a.path().file_name().cmp(&b.path().file_name()));
-
-        for (idx, entry) in entries.iter().enumerate() {
-            let path = entry.path();
-            let is_last: bool = entries.len() - idx - 1 == 0;
-
-            let mut filler_next = String::new();
-            let mut filler_present = String::new();
-
-            match is_last {
-                true => filler_present.push_str(SYMB_TFT),
-                false => filler_present.push_str(SYMB_TTT),
-            }
-
-            filler_next.push_str(&filler_previous);
-            filler_next.push_str(&filler_present);
-
-            if path.is_dir() || (path.is_file() && !directories_only) {
-                println!(
-                    "{}{}{}",
-                    &filler_previous,
-                    &filler_present,
-                    &path.file_name().unwrap().to_str().unwrap()
-                );
-            }
-
-            if path.is_dir() {
-                walk(
-                    &path,
-                    max_depth,
-                    depth + 1,
-                    &filler_next
-                        .replace("─", " ")
-                        .replace("├", "│")
-                        .replace("└", " "),
-                    all,
-                    directories_only,
-                )?;
-            }
-        }
-
-        Ok(())
-    } else {
-        Ok(())
     }
+
+    Ok(())
 }
 
 fn main() -> Result<()> {
