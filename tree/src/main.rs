@@ -7,8 +7,6 @@ use structopt::StructOpt;
 // Better to have these hard-coded
 const SYMB_TFT: &str = "└── ";
 const SYMB_TTT: &str = "├── ";
-const SYMB_FFF: &str = "    ";
-const SYMB_TTF: &str = "│   ";
 
 #[derive(Debug, StructOpt)]
 #[structopt(name = "tree", about = "Basic tree implementation in Rust.")]
