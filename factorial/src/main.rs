@@ -19,11 +19,11 @@ fn main() {
             Ok(n) => {
                 println!("The factorial of {} is {}", n, factorial(n));
                 return;
-            },
+            }
             Err(_) => {
                 eprintln!("Passed a non-valid argument to the program");
                 return;
-            },
+            }
         };
     } else {
         // Loop until a proper input is provided
@@ -46,14 +46,14 @@ fn main() {
                 Ok(n) => {
                     println!("\nThe factorial of {} is {}", n, factorial(n));
                     return;
-                },
+                }
                 Err(_) => {
                     eprintln!("\n======================================================");
                     eprintln!("Please enter a valid input (UNSIGNED INTEGER REQUIRED)");
                     eprintln!("======================================================");
                     println!(); // Let the terminal buffer breath
                     continue;
-                },
+                }
             };
         } // loop
     }
